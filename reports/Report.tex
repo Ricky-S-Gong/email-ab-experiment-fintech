@@ -119,12 +119,6 @@
 
   \vfill
 
-  \begin{minipage}{0.9\textwidth}
-    \centering\small\textit{
-      This report contains proprietary experiment data and analysis.
-      For internal use only.
-    }
-  \end{minipage}
 \end{titlepage}
 
 % ─── Table of Contents ───────────────────────────────────────────────────────
@@ -476,7 +470,7 @@ incremental link-rate analysis but remain valid for funding-rate comparison.
 % ── Data Relationships ────────────────────────────────────────────────────────
 \subsection{Data Relationships \& Join Logic}
 
-Figure~\ref{fig:data_erd} conceptually illustrates how the five datasets relate:
+The five datasets are connected through shared keys as follows:
 
 \begin{enumerate}[leftmargin=2em]
   \item \textbf{\colname{sample\_segment\_groups.csv}} defines segments referenced by
@@ -520,7 +514,7 @@ historical platform activity data:
 
 \begin{table}[H]
   \centering
-  \caption{User Segment Definitions (12 Behavioral Groups)}
+  \caption{User Segment Definitions (12 Behavioral Groups). Source: \texttt{sample\_segment\_groups.csv}. Pool size = total eligible users in the full platform population before 40K-per-segment sampling.}
   \label{tab:segments}
   \resizebox{\textwidth}{!}{%
   \begin{tabular}{@{}lccccr@{}}
@@ -641,7 +635,11 @@ Email open rate is computed at the intersection of user segment group and email 
   \text{Open Rate}_{g,t} = \frac{N_{\text{opened}}(g,t)}{N_{\text{delivered}}(g,t)}
 \end{equation}
 
-where $g$ denotes the treatment group and $t$ denotes the email template. This
+\noindent where $g$ denotes the treatment group (one of the 24 arms), $t$ denotes
+the email template (one of the 10 \texttt{ml\_*} templates),
+$N_{\text{delivered}}(g,t)$ is the count of users in group $g$ whose status for
+template $t$ is non-null (i.e., the email was successfully delivered), and
+$N_{\text{opened}}(g,t)$ is the count whose status equals \texttt{`open'}. This
 metric serves as the \textbf{primary engagement signal}, indicating whether the email
 subject line, sender identity, and send timing resonate with the target segment —
 prior to any downstream conversion measurement.
@@ -835,8 +833,7 @@ profile of the experiment population:
   \includegraphics[width=\textwidth]{ab_test_results.png}
   \caption{Left: Treatment vs.\ control funding rates by group. Dark bars indicate
     statistically significant groups ($p \leq 0.05$); light bars are not significant.
-    Right: Incremental funding rate lift (treatment $-$ control). Green checkmarks
-    ($\checkmark$) mark significant groups.}
+    Right: Incremental funding rate lift (treatment $-$ control) per group.}
   \label{fig:ab_test}
 \end{figure}
 
