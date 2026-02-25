@@ -24,6 +24,8 @@
 \usepackage{lmodern}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+% \colname{} — typewriter column name that allows line breaks at underscores/dots
+\newcommand{\colname}[1]{{\ttfamily\renewcommand{\_}{\textunderscore\allowbreak}#1}}
 
 % ─── Color Definitions ───────────────────────────────────────────────────────
 \definecolor{navy}{RGB}{21,69,128}
@@ -45,7 +47,7 @@
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[L]{\small\textcolor{navy}{Email A/B Experiment — Funding Rate Optimization}}
-\fancyhead[R]{\small\textcolor{navy}{Data Science Report}}
+\fancyhead[R]{\small\textcolor{navy}{Executive Report}}
 \fancyfoot[C]{\thepage}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
@@ -63,6 +65,7 @@
 % ─── Spacing ─────────────────────────────────────────────────────────────────
 \setstretch{1.3}
 \setlength{\parskip}{6pt}
+\emergencystretch=30pt  % allow extra stretch to avoid overfull hboxes in paragraphs
 
 % ─── Graphics Path ───────────────────────────────────────────────────────────
 \graphicspath{{../assets/}}
@@ -248,22 +251,24 @@ content categories designed to address the identified funding barriers:
   \centering
   \caption{Email Template Registry}
   \label{tab:templates}
-  \begin{tabular}{@{}lL{5cm}L{5.5cm}@{}}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{@{}lL{6cm}L{5.5cm}@{}}
     \toprule
     \textbf{ID} & \textbf{Template Name} & \textbf{Content Category} \\
     \midrule
-    0 & ml\_funding\_enables\_investing    & Knowledge: how funding enables investment \\
-    1 & ml\_investing\_starts\_here         & Onboarding: getting started guide \\
-    2 & ml\_explore\_the\_app\_investing    & App exploration (investment features) \\
-    3 & ml\_funding\_faq                    & \textbf{Trust}: FAQ about the funding process \\
-    4 & ml\_user\_clustering\_emails\_fracs & Personalization: ML cluster-based content \\
-    5 & ml\_funding\_is\_safe               & Trust \& Safety: security assurances \\
-    6 & ml\_picking\_an\_investment         & Knowledge: investment selection guidance \\
-    7 & ml\_investing\_101                  & Education: investing basics \\
-    8 & ml\_diversified\_portfolio          & Knowledge: portfolio diversification \\
-    9 & ml\_explore\_the\_app\_list         & App exploration (browsing features) \\
+    0 & \colname{ml\_funding\_enables\_investing}    & Knowledge: how funding enables investment \\
+    1 & \colname{ml\_investing\_starts\_here}        & Onboarding: getting started guide \\
+    2 & \colname{ml\_explore\_the\_app\_investing}   & App exploration (investment features) \\
+    3 & \colname{ml\_funding\_faq}                   & \textbf{Trust}: FAQ about the funding process \\
+    4 & \colname{ml\_user\_clustering\_emails\_fracs} & Personalization: ML cluster-based content \\
+    5 & \colname{ml\_funding\_is\_safe}              & Trust \& Safety: security assurances \\
+    6 & \colname{ml\_picking\_an\_investment}        & Knowledge: investment selection guidance \\
+    7 & \colname{ml\_investing\_101}                 & Education: investing basics \\
+    8 & \colname{ml\_diversified\_portfolio}         & Knowledge: portfolio diversification \\
+    9 & \colname{ml\_explore\_the\_app\_list}        & App exploration (browsing features) \\
     \bottomrule
-  \end{tabular}
+  \end{tabular}%
+  }
 \end{table}
 
 \subsection{Delivery Strategy \& Treatment Arms}
@@ -329,15 +334,15 @@ the analysis.
   \caption{Dataset Summary}
   \label{tab:datasets}
   \resizebox{\textwidth}{!}{%
-  \begin{tabular}{@{}L{5.2cm}C{2.2cm}L{7.5cm}@{}}
+  \begin{tabular}{@{}L{5cm}C{2.5cm}L{7.5cm}@{}}
     \toprule
     \textbf{File} & \textbf{Shape} & \textbf{Role in Analysis} \\
     \midrule
-    \texttt{sample\_segment\_groups.csv}    & $12 \times 8$          & Defines the 12 behavioral user segments; maps segment IDs to feature flags and pool sizes \\
-    \texttt{sample\_uuid\_email\_order.csv} & $480{,}000 \times 13$  & Per-user randomized email delivery schedule; used for time-series pivot and delivery-order analysis \\
-    \texttt{email\_events.csv}              & $9{,}553{,}330 \times 6$ & Raw Post-Office event log; used for deliverability health checks and event volume breakdown \\
-    \texttt{user\_events.csv}               & $480{,}000 \times 22$  & Primary analysis table: per-user email status, account outcomes, and activity metrics \\
-    \texttt{control\_groups\_rate.csv}      & $12 \times 6$          & Pre-computed control group baseline funding and link rates; used as denominator in A/B z-tests \\
+    \colname{sample\_segment\_groups.csv}    & $12 \times 8$            & Defines the 12 behavioral user segments; maps segment IDs to feature flags and pool sizes \\
+    \colname{sample\_uuid\_email\_order.csv} & $480{,}000 \times 13$    & Per-user randomized email delivery schedule; used for time-series pivot and delivery-order analysis \\
+    \colname{email\_events.csv}              & $9{,}553{,}330 \times 6$ & Raw Post-Office event log; used for deliverability health checks and event volume breakdown \\
+    \colname{user\_events.csv}               & $480{,}000 \times 22$    & Primary analysis table: per-user email status, account outcomes, and activity metrics \\
+    \colname{control\_groups\_rate.csv}      & $12 \times 6$            & Pre-computed control group baseline funding and link rates; used as denominator in A/B z-tests \\
     \bottomrule
   \end{tabular}%
   }
@@ -356,17 +361,17 @@ number of users available in the full population for each segment (prior to the
   \caption{Schema: \texttt{sample\_segment\_groups.csv}}
   \label{tab:schema_segments}
   \resizebox{\textwidth}{!}{%
-  \begin{tabular}{@{}L{5.5cm}L{2cm}L{7.5cm}@{}}
+  \begin{tabular}{@{}L{5cm}L{2cm}L{8cm}@{}}
     \toprule
     \textbf{Column} & \textbf{Type} & \textbf{Description} \\
     \midrule
-    \texttt{group\_id}                      & int   & Integer ID 0--11 identifying the segment \\
-    \texttt{approved\_within6M\_flag}        & bool  & True if user's account was approved within the past 6 months; proxy for recency of intent \\
-    \texttt{link\_flag}                      & bool  & True if user has linked at least one bank account; prerequisite for funding \\
-    \texttt{recent\_activity\_flag(20days)}  & bool  & True if user had any platform activity (login, browse, etc.) in the past 20 days \\
-    \texttt{5day\_trade\_flag}               & bool  & True if user executed at least one trade in the past 5 days; strongest engagement signal \\
-    \texttt{user\_uuid}                      & int   & \textbf{Note:} this column stores the \textit{count} of users in the full population pool for that segment, \textbf{not} an individual user ID \\
-    \texttt{group\_name}                     & str   & Human-readable segment label constructed by concatenating the active flags (e.g., \texttt{6M\_App-link-20D\_Act}) \\
+    \colname{group\_id}                     & int   & Integer ID 0--11 identifying the segment \\
+    \colname{approved\_within6M\_flag}      & bool  & True if user's account was approved within the past 6 months; proxy for recency of intent \\
+    \colname{link\_flag}                    & bool  & True if user has linked at least one bank account; prerequisite for funding \\
+    \colname{recent\_activity\_flag(20days)} & bool  & True if user had any platform activity (login, browse, etc.) in the past 20 days \\
+    \colname{5day\_trade\_flag}             & bool  & True if user executed at least one trade in the past 5 days; strongest engagement signal \\
+    \colname{user\_uuid}                    & int   & \textbf{Note:} this column stores the \textit{count} of users in the full population pool for that segment, \textbf{not} an individual user ID \\
+    \colname{group\_name}                   & str   & Human-readable segment label constructed by concatenating the active flags (e.g., \texttt{6M\_App-link-20D\_Act}) \\
     \bottomrule
   \end{tabular}%
   }
@@ -392,17 +397,17 @@ experiment's scheduling pipeline before any emails were sent.
   \caption{Schema: \texttt{sample\_uuid\_email\_order.csv}}
   \label{tab:schema_order}
   \resizebox{\textwidth}{!}{%
-  \begin{tabular}{@{}L{3.5cm}L{2cm}L{9.5cm}@{}}
+  \begin{tabular}{@{}L{3cm}L{2cm}L{10cm}@{}}
     \toprule
     \textbf{Column} & \textbf{Type} & \textbf{Description} \\
     \midrule
-    \texttt{user\_uuid} & str  & Unique user identifier in the format \texttt{id\_\{integer\}}; primary key for joining with \texttt{user\_events.csv} \\
-    \texttt{group\_id}  & int  & Integer segment ID 0--23 (24 groups = 12 segments $\times$ 2 frequencies) \\
-    \texttt{group\_name}& str  & Full treatment group label, e.g., \texttt{20D\_Act\_D} (daily) or \texttt{6M\_App\_W} (twice-a-week) \\
-    \texttt{order\_0}   & int  & Index (0--9) into \texttt{PO\_number\_list} of the email sent at delivery position 0 (first send) \\
-    \texttt{order\_1}   & int  & Email index for delivery position 1 (second send) \\
+    \colname{user\_uuid}  & str  & Unique user identifier in the format \texttt{id\_\{integer\}}; primary key for joining with \texttt{user\_events.csv} \\
+    \colname{group\_id}   & int  & Integer segment ID 0--23 (24 groups = 12 segments $\times$ 2 frequencies) \\
+    \colname{group\_name} & str  & Full treatment group label, e.g., \texttt{20D\_Act\_D} (daily) or \texttt{6M\_App\_W} (twice-a-week) \\
+    \colname{order\_0}    & int  & Index (0--9) into \texttt{PO\_number\_list} of the email sent at delivery position 0 (first send) \\
+    \colname{order\_1}    & int  & Email index for delivery position 1 (second send) \\
     $\vdots$ & $\vdots$ & $\vdots$ \\
-    \texttt{order\_9}   & int  & Email index for delivery position 9 (tenth/final send) \\
+    \colname{order\_9}    & int  & Email index for delivery position 9 (tenth/final send) \\
     \bottomrule
   \end{tabular}%
   }
@@ -437,39 +442,39 @@ activity metrics used as behavioral covariates.
   \caption{Schema: \texttt{user\_events.csv} (480,000 rows $\times$ 22 columns)}
   \label{tab:schema_user_events}
   \resizebox{\textwidth}{!}{%
-  \begin{tabular}{@{}L{5.8cm}L{2cm}L{8.5cm}@{}}
+  \begin{tabular}{@{}L{5.5cm}L{2cm}L{9cm}@{}}
     \toprule
     \textbf{Column} & \textbf{Type} & \textbf{Description} \\
     \midrule
     \multicolumn{3}{@{}l}{\textit{Identifiers \& Group Assignment}} \\
-    \texttt{user\_uuid}   & str & Unique user ID; primary key \\
-    \texttt{group\_name}  & str & Treatment arm (24 possible values, e.g., \texttt{6M\_App\_D}) \\
+    \colname{user\_uuid}  & str & Unique user ID; primary key \\
+    \colname{group\_name} & str & Treatment arm (24 possible values, e.g., \texttt{6M\_App\_D}) \\
     \midrule
     \multicolumn{3}{@{}l}{\textit{Email Interaction Status (one column per template)}} \\
-    \texttt{ml\_funding\_enables\_investing}    & str/NaN & Summarized email status \\
-    \texttt{ml\_investing\_starts\_here}         & str/NaN & Summarized email status \\
-    \texttt{ml\_explore\_the\_app\_investing}    & str/NaN & Summarized email status \\
-    \texttt{ml\_funding\_faq}                    & str/NaN & Summarized email status \\
-    \texttt{ml\_user\_clustering\_emails\_fracs} & str/NaN & Summarized email status \\
-    \texttt{ml\_funding\_is\_safe}               & str/NaN & Summarized email status \\
-    \texttt{ml\_picking\_an\_investment}         & str/NaN & Summarized email status \\
-    \texttt{ml\_investing\_101}                  & str/NaN & Summarized email status \\
-    \texttt{ml\_diversified\_portfolio}          & str/NaN & Summarized email status \\
-    \texttt{ml\_explore\_the\_app\_list}         & str/NaN & Summarized email status \\
+    \colname{ml\_funding\_enables\_investing}    & str/NaN & Summarized email status \\
+    \colname{ml\_investing\_starts\_here}        & str/NaN & Summarized email status \\
+    \colname{ml\_explore\_the\_app\_investing}   & str/NaN & Summarized email status \\
+    \colname{ml\_funding\_faq}                   & str/NaN & Summarized email status \\
+    \colname{ml\_user\_clustering\_emails\_fracs} & str/NaN & Summarized email status \\
+    \colname{ml\_funding\_is\_safe}              & str/NaN & Summarized email status \\
+    \colname{ml\_picking\_an\_investment}        & str/NaN & Summarized email status \\
+    \colname{ml\_investing\_101}                 & str/NaN & Summarized email status \\
+    \colname{ml\_diversified\_portfolio}         & str/NaN & Summarized email status \\
+    \colname{ml\_explore\_the\_app\_list}        & str/NaN & Summarized email status \\
     \midrule
     \multicolumn{3}{@{}l}{\textit{Account Lifecycle Outcomes (primary and secondary outcome variables)}} \\
-    \texttt{approved\_at}                   & datetime & Timestamp when the user's account was approved by compliance/KYC \\
-    \texttt{first\_funded\_at}               & datetime & Timestamp of the user's first qualifying deposit (\textbf{primary outcome}); NaN = not yet funded \\
-    \texttt{first\_linked\_bank\_account\_at} & datetime & Timestamp of first bank account linkage (\textbf{secondary outcome}); NaN = not yet linked \\
+    \colname{approved\_at}                   & datetime & Timestamp when the user's account was approved by compliance/KYC \\
+    \colname{first\_funded\_at}              & datetime & Timestamp of the user's first qualifying deposit (\textbf{primary outcome}); NaN = not yet funded \\
+    \colname{first\_linked\_bank\_account\_at} & datetime & Timestamp of first bank account linkage (\textbf{secondary outcome}); NaN = not yet linked \\
     \midrule
     \multicolumn{3}{@{}l}{\textit{Platform Activity Metrics (behavioral covariates)}} \\
-    \texttt{5d\_trading\_avg\_event\_count}    & float & Average number of trading events per day over the past 5 days; NaN = no recent trading \\
-    \texttt{2d\_non\_trading\_avg\_event\_count} & float & Average non-trading app events (browse, login) per day over the past 2 days \\
-    \texttt{20d\_trading\_avg\_event\_count}   & float & Average trading events per day over the past 20 days; broader engagement window \\
-    \texttt{8d\_non\_trading\_avg\_event\_count} & float & Average non-trading events per day over the past 8 days \\
-    \texttt{1d\_trading\_avg\_event\_count}    & float & Average trading events on the most recent day; most sensitive recency signal \\
-    \texttt{1d\_non\_trading\_avg\_event\_count} & float & Average non-trading events on the most recent day \\
-    \texttt{num\_received\_email}              & int   & Total number of emails successfully delivered to this user (0--10); used to filter active treatment participants \\
+    \colname{5d\_trading\_avg\_event\_count}    & float & Average number of trading events per day over the past 5 days; NaN = no recent trading \\
+    \colname{2d\_non\_trading\_avg\_event\_count} & float & Average non-trading app events (browse, login) per day over the past 2 days \\
+    \colname{20d\_trading\_avg\_event\_count}   & float & Average trading events per day over the past 20 days; broader engagement window \\
+    \colname{8d\_non\_trading\_avg\_event\_count} & float & Average non-trading events per day over the past 8 days \\
+    \colname{1d\_trading\_avg\_event\_count}    & float & Average trading events on the most recent day; most sensitive recency signal \\
+    \colname{1d\_non\_trading\_avg\_event\_count} & float & Average non-trading events on the most recent day \\
+    \colname{num\_received\_email}             & int   & Total number of emails successfully delivered to this user (0--10); used to filter active treatment participants \\
     \bottomrule
   \end{tabular}%
   }
@@ -508,16 +513,16 @@ making it significantly larger (9.55M rows).
   \caption{Schema: \texttt{email\_events.csv} (9,553,330 rows $\times$ 6 columns)}
   \label{tab:schema_email_events}
   \resizebox{\textwidth}{!}{%
-  \begin{tabular}{@{}L{5.8cm}L{2cm}L{8.5cm}@{}}
+  \begin{tabular}{@{}L{5.5cm}L{2cm}L{8.5cm}@{}}
     \toprule
     \textbf{Column} & \textbf{Type} & \textbf{Description} \\
     \midrule
-    \texttt{stitch\_email\_events.category} & str  & JSON-like string encoding the email template name and sender system (e.g., \texttt{["ml\_funding\_faq","post-office"]}); template name must be parsed out \\
-    \texttt{stitch\_email\_events.dt\_date} & str  & Date of the event in \texttt{YYYY-MM-DD} format; enables time-series event analysis \\
-    \texttt{user\_uuid}                     & str  & User identifier; joins to \texttt{user\_events.csv} and \texttt{sample\_uuid\_email\_order.csv} \\
-    \texttt{event}                          & str  & Event type (see Table~\ref{tab:events} for all values and volumes) \\
-    \texttt{reason}                         & str  & For bounce/drop events, the technical reason string from the ESP; NaN for normal events \\
-    \texttt{stitch\_email\_events.count\_events} & int & Number of times this specific event occurred for this user-email-date combination (usually 1; may be $>1$ for \texttt{open} repeat opens) \\
+    \colname{stitch\_email\_events.category}    & str  & JSON-like string encoding the email template name and sender system (e.g., \texttt{["ml\_funding\_faq","post-office"]}); template name must be parsed out \\
+    \colname{stitch\_email\_events.dt\_date}    & str  & Date of the event in \texttt{YYYY-MM-DD} format; enables time-series event analysis \\
+    \colname{user\_uuid}                        & str  & User identifier; joins to \texttt{user\_events.csv} and \texttt{sample\_uuid\_email\_order.csv} \\
+    \colname{event}                             & str  & Event type (see Table~\ref{tab:events} for all values and volumes) \\
+    \colname{reason}                            & str  & For bounce/drop events, the technical reason string from the ESP; NaN for normal events \\
+    \colname{stitch\_email\_events.count\_events} & int & Number of times this specific event occurred for this user-email-date combination (usually 1; may be $>1$ for \texttt{open} repeat opens) \\
     \bottomrule
   \end{tabular}%
   }
@@ -564,16 +569,16 @@ for the A/B significance testing in Section~\ref{sec:ab}.
   \caption{Schema: \texttt{control\_groups\_rate.csv} (12 rows $\times$ 6 columns)}
   \label{tab:schema_control}
   \resizebox{\textwidth}{!}{%
-  \begin{tabular}{@{}L{5.2cm}L{2cm}L{8.5cm}@{}}
+  \begin{tabular}{@{}L{5cm}L{2cm}L{8.5cm}@{}}
     \toprule
     \textbf{Column} & \textbf{Type} & \textbf{Description} \\
     \midrule
-    \texttt{group\_name}            & str   & Segment label with \texttt{\_D} suffix (one row per segment; both \texttt{\_D} and \texttt{\_W} treatment arms reference the same control row via name matching) \\
-    \texttt{num\_users\_in\_control} & int   & Total number of users in the control group for this segment (these users had the same segment flags but were not enrolled in email treatment) \\
-    \texttt{num\_funded\_in\_control} & int  & Number of control users who funded their account during the observation window; used as the numerator for $p_{\text{control}}$ \\
-    \texttt{funding\_rate\_in\_control} & float & $= \texttt{num\_funded} / \texttt{num\_users}$; the baseline funding rate used as the null hypothesis value $p_0$ in the proportions z-test \\
-    \texttt{num\_link\_in\_control}  & int   & Number of control users who linked a bank account during the window \\
-    \texttt{link\_rate\_in\_control} & float & Baseline bank-link rate for the control group; used for incremental link-rate analysis \\
+    \colname{group\_name}              & str   & Segment label with \texttt{\_D} suffix (one row per segment; both \texttt{\_D} and \texttt{\_W} treatment arms reference the same control row via name matching) \\
+    \colname{num\_users\_in\_control}  & int   & Total number of users in the control group for this segment (these users had the same segment flags but were not enrolled in email treatment) \\
+    \colname{num\_funded\_in\_control} & int   & Number of control users who funded their account during the observation window; used as the numerator for $p_{\text{control}}$ \\
+    \colname{funding\_rate\_in\_control} & float & $= \texttt{num\_funded} / \texttt{num\_users}$; the baseline funding rate used as the null hypothesis value $p_0$ in the proportions z-test \\
+    \colname{num\_link\_in\_control}   & int   & Number of control users who linked a bank account during the window \\
+    \colname{link\_rate\_in\_control}  & float & Baseline bank-link rate for the control group; used for incremental link-rate analysis \\
     \bottomrule
   \end{tabular}%
   }
@@ -591,10 +596,10 @@ incremental link-rate analysis but remain valid for funding-rate comparison.
 Figure~\ref{fig:data_erd} conceptually illustrates how the five datasets relate:
 
 \begin{enumerate}[leftmargin=2em]
-  \item \textbf{\texttt{sample\_segment\_groups.csv}} defines segments referenced by
-    \texttt{group\_id} and \texttt{group\_name} in both \texttt{sample\_uuid\_email\_order.csv}
+  \item \textbf{\colname{sample\_segment\_groups.csv}} defines segments referenced by
+    \texttt{group\_id} and \texttt{group\_name} in both \colname{sample\_uuid\_email\_order.csv}
     and \texttt{user\_events.csv}.
-  \item \textbf{\texttt{sample\_uuid\_email\_order.csv}} and \textbf{\texttt{user\_events.csv}}
+  \item \textbf{\colname{sample\_uuid\_email\_order.csv}} and \textbf{\texttt{user\_events.csv}}
     share \texttt{user\_uuid} as the primary join key (one row per user in both).
     The merge produces the ``big table'' used for time-series analysis: schedule
     columns (\texttt{order\_0}\ldots\texttt{order\_9}) are mapped to email names,
@@ -658,12 +663,12 @@ The consistent outperformance points to a universal concern: ``I don't understan
 funding works or whether it's safe.''
 
 \textbf{Finding 3 — Personalized clustering works.}
-The \texttt{ml\_user\_clustering\_emails\_fracs} template (second-best performer)
+The \colname{ml\_user\_clustering\_emails\_fracs} template (second-best performer)
 suggests that ML-personalized content, which dynamically adjusts messaging based on
 user cluster membership, creates meaningful lift over static templates.
 
 \textbf{Finding 4 — Portfolio diversification is premature.}
-The \texttt{ml\_diversified\_portfolio} template consistently underperforms. Users
+The \colname{ml\_diversified\_portfolio} template consistently underperforms. Users
 who have not yet funded their accounts are not cognitively ready for advanced
 portfolio optimization content — they first need to overcome the activation barrier.
 
@@ -864,7 +869,7 @@ efficiency perspective, de-prioritizing email outreach to these groups preserves
 deliverability budget and reduces unsubscribe risk without sacrificing conversion volume.
 
 \textbf{Result 4 — Cold-start users respond to email activation.}
-The \texttt{ML\_unfund\_exp\_control\_D} group (the baseline cold-user segment with
+The \colname{ML\_unfund\_exp\_control\_D} group (the baseline cold-user segment with
 no distinguishing behavioral signals) shows significant lift ($+0.18\%$, $p = 0.0013$).
 While the absolute delta is small, the statistical confidence is high due to the
 large sample size. This validates the hypothesis that even minimally-engaged users
@@ -1098,7 +1103,7 @@ users. Key conclusions:
 
   \item \textbf{FAQ-style content that directly addresses funding concerns} (the
     \texttt{ml\_funding\_faq} template) outperforms motivational, educational, and
-    app-exploration content by a substantial margin — consistent with the hypothesis
+    app-exploration content by a substantial margin, consistent with the hypothesis
     that knowledge barriers are the primary obstacle.
 
   \item \textbf{The second email in sequence (order\_1) outperforms the first (order\_0)},
