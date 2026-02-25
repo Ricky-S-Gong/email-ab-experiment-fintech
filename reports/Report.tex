@@ -24,6 +24,7 @@
 \usepackage{lmodern}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\raggedbottom
 % \colname{} — typewriter column name that allows line breaks at underscores/dots
 \newcommand{\colname}[1]{{\ttfamily\renewcommand{\_}{\textunderscore\allowbreak}#1}}
 
@@ -198,6 +199,7 @@ The experiment was scoped to address four primary business questions:
     significantly impact outcomes?
 \end{enumerate}
 
+\clearpage
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Experiment Design}
 % ─────────────────────────────────────────────────────────────────────────────
@@ -326,6 +328,7 @@ observed funding rate in the treatment arm, $p_{\text{control}}$ is the segment-
 baseline rate sourced from \colname{control\_groups\_rate.csv}, and $n_{\text{treat}}$ is
 the number of approved users assigned to the treatment arm.
 
+\clearpage
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Data Description}
 % ─────────────────────────────────────────────────────────────────────────────
@@ -622,6 +625,7 @@ Figure~\ref{fig:data_erd} conceptually illustrates how the five datasets relate:
     maintained at the segment level, not the frequency level).
 \end{enumerate}
 
+\clearpage
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Email Open Rate Analysis}
 % ─────────────────────────────────────────────────────────────────────────────
@@ -691,6 +695,7 @@ The lowest-engagement segment is the baseline \textbf{ML\_unfund\_exp\_control} 
 users with no distinguishing behavioral signals. This is expected — cold users with
 no active engagement history are harder to activate via email alone.
 
+\clearpage
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Negative Effects Analysis}
 \label{sec:negative}
@@ -734,6 +739,7 @@ alongside primary success metrics. Two critical negative signals are:
 Email deliverability and sender reputation remain intact. No templates or segments
 require throttling or suppression based on negative effect rates alone.
 
+\clearpage
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Correlation Analysis: User Traits vs.\ Email Open Rate}
 % ─────────────────────────────────────────────────────────────────────────────
@@ -778,6 +784,7 @@ The correlation analysis yields several actionable insights:
     more receptive to investment-themed email content.
 \end{enumerate}
 
+\clearpage
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Link \& Funding Rate Analysis}
 % ─────────────────────────────────────────────────────────────────────────────
@@ -812,6 +819,7 @@ profile of the experiment population:
     within the same segment.
 \end{itemize}
 
+\clearpage
 % ─────────────────────────────────────────────────────────────────────────────
 \section{A/B Testing: Causal Impact on Funding Rate}
 \label{sec:ab}
@@ -902,6 +910,7 @@ Summing across statistically significant groups, the experiment is estimated to 
 produced \textbf{approximately 500+ email-attributable funded accounts} — each
 representing a platform user with a first deposit, trading potential, and long-term LTV.
 
+\clearpage
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Time Series Analysis: Email Cadence \& Engagement Dynamics}
 % ─────────────────────────────────────────────────────────────────────────────
@@ -980,6 +989,7 @@ future campaigns:
     than position 0 may further amplify the priming effect.
 \end{enumerate}
 
+\clearpage
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Funnel Analysis: Email Open \texorpdfstring{$\to$}{→} Link \texorpdfstring{$\to$}{→} Fund}
 % ─────────────────────────────────────────────────────────────────────────────
@@ -1001,7 +1011,7 @@ ultimate business outcome:
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{funnel_analysis.png}
+  \includegraphics[width=0.88\textwidth]{funnel_analysis.png}
   \caption{Left: Conversion funnel curves for statistically significant treatment groups.
     Right: Incremental lift scatter plot — groups in the upper-right quadrant show the
     highest email-attributable gains in both link and funding rates.}
@@ -1101,6 +1111,7 @@ who convert organically.
 
 \end{enumerate}
 
+\clearpage
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Conclusion}
 % ─────────────────────────────────────────────────────────────────────────────
