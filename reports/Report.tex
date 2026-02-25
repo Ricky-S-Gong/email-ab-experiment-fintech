@@ -54,9 +54,9 @@
 \renewcommand{\footrulewidth}{0.4pt}
 
 % ─── Section Styling ─────────────────────────────────────────────────────────
-\titleformat{\section}{\large\bfseries\color{navy}}{}{0em}{\thesection\quad}
-\titleformat{\subsection}{\normalsize\bfseries\color{navy}}{}{0em}{\thesubsection\quad}
-\titleformat{\subsubsection}{\normalsize\itshape\color{navy}}{}{0em}{\thesubsubsection\quad}
+\titleformat{\section}{\large\bfseries\color{navy}}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries\color{navy}}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\normalsize\itshape\color{navy}}{\thesubsubsection}{1em}{}
 
 % ─── Table Column Types ──────────────────────────────────────────────────────
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
@@ -931,7 +931,7 @@ creating a time-aligned view of engagement across the delivery sequence.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{time_series_open_rate.png}
+  \includegraphics[width=0.82\textwidth]{time_series_open_rate.png}
   \caption{Open rate heatmap by delivery order. Top: Daily groups (experiment complete).
     Bottom: Twice-a-week groups (order\_9 pending — experiment not yet complete).}
   \label{fig:time_series}
@@ -1152,9 +1152,11 @@ multi-arm A/B testing with matched controls, causal attribution via proportions
 z-tests, and time-series engagement analysis — provides a replicable template for
 future growth experiments at scale.
 
+\clearpage
 % ─────────────────────────────────────────────────────────────────────────────
-\section*{Appendix: Technical Implementation Notes}
+\phantomsection
 \addcontentsline{toc}{section}{Appendix: Technical Implementation Notes}
+\section*{Appendix: Technical Implementation Notes}
 % ─────────────────────────────────────────────────────────────────────────────
 
 \subsection*{A. Statistical Test Selection}
@@ -1194,6 +1196,7 @@ delivery position $d$, look up the email status for whichever template was assig
 at that position. This is implemented via a vectorized mask loop over the
 10 email templates to avoid the performance penalty of row-wise \texttt{apply}.
 
+\clearpage
 % ─────────────────────────────────────────────────────────────────────────────
 % References
 % ─────────────────────────────────────────────────────────────────────────────
