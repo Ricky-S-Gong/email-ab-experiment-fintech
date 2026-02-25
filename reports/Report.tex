@@ -145,6 +145,10 @@ conversion metrics. Formally, the funding rate is defined as:
   \text{Funding Rate} = \frac{|\text{Users who completed first deposit}|}{|\text{Users with approved accounts}|}
 \end{equation}
 
+\noindent where the numerator counts users whose \colname{first\_funded\_at} timestamp is
+non-null (i.e., at least one deposit was completed), and the denominator counts all
+approved accounts enrolled in the experiment.
+
 A substantial proportion of users successfully complete the account approval process
 but never take the final step of depositing funds and initiating investment activity.
 This \textbf{funding gap} represents a direct revenue shortfall, as most retail investing
@@ -316,6 +320,11 @@ significance level $\alpha = 0.05$:
   Z = \frac{\hat{p}_{\text{treat}} - p_{\text{control}}}%
       {\sqrt{p_{\text{control}}(1 - p_{\text{control}}) / n_{\text{treat}}}}
 \end{equation}
+
+\noindent where $Z$ is the standardized test statistic, $\hat{p}_{\text{treat}}$ is the
+observed funding rate in the treatment arm, $p_{\text{control}}$ is the segment-specific
+baseline rate sourced from \colname{control\_groups\_rate.csv}, and $n_{\text{treat}}$ is
+the number of approved users assigned to the treatment arm.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Data Description}
@@ -884,6 +893,11 @@ translates to meaningful absolute user counts given the experiment scale:
   \Delta N_{\text{funded}} = \Delta p \times N_{\text{treatment}}
 \end{equation}
 
+\noindent where $\Delta N_{\text{funded}}$ is the estimated number of email-attributable
+funded accounts, $\Delta p = \hat{p}_{\text{treat}} - p_{\text{control}}$ is the observed
+funding rate lift, and $N_{\text{treatment}}$ is the number of approved users in the
+treatment arm.
+
 Summing across statistically significant groups, the experiment is estimated to have
 produced \textbf{approximately 500+ email-attributable funded accounts} — each
 representing a platform user with a first deposit, trading potential, and long-term LTV.
@@ -1015,6 +1029,7 @@ for \textbf{segment-specific investment allocation}: email budget should flow to
 medium-intent segments where activation energy is achievable, not high-intent segments
 who convert organically.
 
+\clearpage
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Business Recommendations \& Next Steps}
 % ─────────────────────────────────────────────────────────────────────────────
