@@ -201,135 +201,6 @@ The experiment was scoped to address four primary business questions:
 
 \clearpage
 % ─────────────────────────────────────────────────────────────────────────────
-\section{Experiment Design}
-% ─────────────────────────────────────────────────────────────────────────────
-
-\subsection{Audience Selection}
-
-The experiment targets \textbf{480,000 approved-but-unfunded users} as of November 27,
-2020. ``Approved'' indicates that the user has successfully passed identity verification
-and KYC checks required to open a brokerage account, but has not yet made a qualifying
-deposit (first funding event).
-
-From the eligible population of $\sim$7.7M users per segment data, 40,000 users
-were randomly sampled from each of the 12 behavioral segments for inclusion in the
-experiment. This stratified sampling design ensures that treatment effects can be
-estimated within each segment without cross-segment confounding.
-
-\subsection{User Segmentation}
-
-User segmentation is rule-based, defined by four binary behavioral flags derived from
-historical platform activity data:
-
-\begin{table}[H]
-  \centering
-  \caption{User Segment Definitions (12 Behavioral Groups)}
-  \label{tab:segments}
-  \resizebox{\textwidth}{!}{%
-  \begin{tabular}{@{}lccccr@{}}
-    \toprule
-    \textbf{Segment Name} & \textbf{Approved $<$6M} & \textbf{Bank Linked} &
-    \textbf{Active 20d} & \textbf{Trade 5d} & \textbf{Total Pool Size} \\
-    \midrule
-    ML\_unfund\_exp\_control      & $\times$     & $\times$     & $\times$     & $\times$     & 4,343,086 \\
-    20D\_Act                      & $\times$     & $\times$     & $\checkmark$ & $\times$     &   360,430 \\
-    20D\_Act-5D\_Act              & $\times$     & $\times$     & $\checkmark$ & $\checkmark$ &   374,603 \\
-    link                          & $\times$     & $\checkmark$ & $\times$     & $\times$     &   921,347 \\
-    link-20D\_Act                 & $\times$     & $\checkmark$ & $\checkmark$ & $\times$     &   115,686 \\
-    link-20D\_Act-5D\_Act         & $\times$     & $\checkmark$ & $\checkmark$ & $\checkmark$ &   123,536 \\
-    6M\_App                       & $\checkmark$ & $\times$     & $\times$     & $\times$     &   845,514 \\
-    6M\_App-20D\_Act              & $\checkmark$ & $\times$     & $\checkmark$ & $\times$     &   227,223 \\
-    6M\_App-20D\_Act-5D\_Act      & $\checkmark$ & $\times$     & $\checkmark$ & $\checkmark$ &   210,603 \\
-    6M\_App-link                  & $\checkmark$ & $\checkmark$ & $\times$     & $\times$     &   135,009 \\
-    6M\_App-link-20D\_Act         & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\times$     &    53,211 \\
-    6M\_App-link-20D\_Act-5D\_Act & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ &    65,976 \\
-    \bottomrule
-  \end{tabular}%
-  }
-\end{table}
-
-\subsection{Email Templates}
-
-Ten ML-generated email templates were prepared, organized across three strategic
-content categories designed to address the identified funding barriers:
-
-\begin{table}[H]
-  \centering
-  \caption{Email Template Registry}
-  \label{tab:templates}
-  \resizebox{\textwidth}{!}{%
-  \begin{tabular}{@{}lL{6cm}L{5.5cm}@{}}
-    \toprule
-    \textbf{ID} & \textbf{Template Name} & \textbf{Content Category} \\
-    \midrule
-    0 & \colname{ml\_funding\_enables\_investing}    & Knowledge: how funding enables investment \\
-    1 & \colname{ml\_investing\_starts\_here}        & Onboarding: getting started guide \\
-    2 & \colname{ml\_explore\_the\_app\_investing}   & App exploration (investment features) \\
-    3 & \colname{ml\_funding\_faq}                   & \textbf{Trust}: FAQ about the funding process \\
-    4 & \colname{ml\_user\_clustering\_emails\_fracs} & Personalization: ML cluster-based content \\
-    5 & \colname{ml\_funding\_is\_safe}              & Trust \& Safety: security assurances \\
-    6 & \colname{ml\_picking\_an\_investment}        & Knowledge: investment selection guidance \\
-    7 & \colname{ml\_investing\_101}                 & Education: investing basics \\
-    8 & \colname{ml\_diversified\_portfolio}         & Knowledge: portfolio diversification \\
-    9 & \colname{ml\_explore\_the\_app\_list}        & App exploration (browsing features) \\
-    \bottomrule
-  \end{tabular}%
-  }
-\end{table}
-
-\subsection{Delivery Strategy \& Treatment Arms}
-
-Each of the 12 behavioral segments is split into two frequency sub-groups:
-
-\begin{itemize}[leftmargin=2em]
-  \item \textbf{Daily (\texttt{\_D})}: Emails sent on Days 0 through 9 (one per day,
-    for 10 consecutive days starting 2020-11-30).
-  \item \textbf{Twice-a-week (\texttt{\_W})}: Emails sent on a Monday/Friday schedule —
-    Days 0, 4, 7, 11, 14, 18, 21, 25, 28, 32 — spanning approximately 5 weeks.
-\end{itemize}
-
-This yields $12 \times 2 = \mathbf{24}$ treatment arms. Within each treatment arm,
-the order of the 10 email templates is \textbf{randomized without replacement} for
-each individual user. This ensures the experiment explores the full combinatorial
-space of email sequences rather than testing a fixed canonical order, preventing
-any single template from being systematically positioned first or last.
-
-\subsection{Control Groups}
-
-For each of the 12 behavioral segments, a \textbf{matched control group} of users
-with identical segmentation rules received no emails during the experiment period.
-Pre-computed control group funding and link rates (stored in
-\texttt{control\_groups\_rate.csv}) serve as the baseline for A/B significance testing.
-
-The control group design is critical for \textbf{causal identification}: it allows us
-to disentangle organic conversion (users who would have funded regardless of email)
-from email-attributable incremental lift.
-
-\subsection{Statistical Hypothesis Framework}
-
-For each treatment arm $g$, we test the one-sided hypothesis:
-
-\begin{align}
-  H_0 &: p_{\text{treatment},g} \leq p_{\text{control},g} \\
-  H_1 &: p_{\text{treatment},g} > p_{\text{control},g}
-\end{align}
-
-where $p$ denotes the funding rate (proportion of users who funded during the
-experiment window). The test statistic is a one-sided proportions Z-test at
-significance level $\alpha = 0.05$:
-
-\begin{equation}
-  Z = \frac{\hat{p}_{\text{treat}} - p_{\text{control}}}%
-      {\sqrt{p_{\text{control}}(1 - p_{\text{control}}) / n_{\text{treat}}}}
-\end{equation}
-
-\noindent where $Z$ is the standardized test statistic, $\hat{p}_{\text{treat}}$ is the
-observed funding rate in the treatment arm, $p_{\text{control}}$ is the segment-specific
-baseline rate sourced from \colname{control\_groups\_rate.csv}, and $n_{\text{treat}}$ is
-the number of approved users assigned to the treatment arm.
-
-\clearpage
-% ─────────────────────────────────────────────────────────────────────────────
 \section{Data Description}
 % ─────────────────────────────────────────────────────────────────────────────
 
@@ -624,6 +495,138 @@ Figure~\ref{fig:data_erd} conceptually illustrates how the five datasets relate:
     matched to their \texttt{\_D} control counterpart, since control groups are
     maintained at the segment level, not the frequency level).
 \end{enumerate}
+
+\clearpage
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Experiment Design}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\subsection{Audience Selection}
+
+The experiment targets \textbf{480,000 approved-but-unfunded users} as of November 27,
+2020. ``Approved'' indicates that the user has successfully passed identity verification
+and KYC checks required to open a brokerage account, but has not yet made a qualifying
+deposit (first funding event).
+
+From the eligible population of $\sim$7.7M users per segment data, 40,000 users
+were randomly sampled from each of the 12 behavioral segments for inclusion in the
+experiment. This stratified sampling design ensures that treatment effects can be
+estimated within each segment without cross-segment confounding.
+
+\subsection{User Segmentation}
+
+User segmentation is rule-based, defined by four binary behavioral flags derived from
+historical platform activity data:
+
+\begin{table}[H]
+  \centering
+  \caption{User Segment Definitions (12 Behavioral Groups)}
+  \label{tab:segments}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{@{}lccccr@{}}
+    \toprule
+    \textbf{Segment Name} & \textbf{Approved $<$6M} & \textbf{Bank Linked} &
+    \textbf{Active 20d} & \textbf{Trade 5d} & \textbf{Total Pool Size} \\
+    \midrule
+    ML\_unfund\_exp\_control      & $\times$     & $\times$     & $\times$     & $\times$     & 4,343,086 \\
+    20D\_Act                      & $\times$     & $\times$     & $\checkmark$ & $\times$     &   360,430 \\
+    20D\_Act-5D\_Act              & $\times$     & $\times$     & $\checkmark$ & $\checkmark$ &   374,603 \\
+    link                          & $\times$     & $\checkmark$ & $\times$     & $\times$     &   921,347 \\
+    link-20D\_Act                 & $\times$     & $\checkmark$ & $\checkmark$ & $\times$     &   115,686 \\
+    link-20D\_Act-5D\_Act         & $\times$     & $\checkmark$ & $\checkmark$ & $\checkmark$ &   123,536 \\
+    6M\_App                       & $\checkmark$ & $\times$     & $\times$     & $\times$     &   845,514 \\
+    6M\_App-20D\_Act              & $\checkmark$ & $\times$     & $\checkmark$ & $\times$     &   227,223 \\
+    6M\_App-20D\_Act-5D\_Act      & $\checkmark$ & $\times$     & $\checkmark$ & $\checkmark$ &   210,603 \\
+    6M\_App-link                  & $\checkmark$ & $\checkmark$ & $\times$     & $\times$     &   135,009 \\
+    6M\_App-link-20D\_Act         & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\times$     &    53,211 \\
+    6M\_App-link-20D\_Act-5D\_Act & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ &    65,976 \\
+    \bottomrule
+  \end{tabular}%
+  }
+\end{table}
+
+
+\textbf{Note on \texttt{ML\_unfund\_exp\_control}}: This is the catch-all baseline segment comprising users with \textbf{all four behavioral flags set to False} — approved more than six months ago, no linked bank account, no platform activity in the past 20 days, and no recent trades. With a pool of 4.3M users it is by far the largest segment. Despite carrying no positive engagement signals, it is included in the experiment as a \textbf{cold-start control arm}: if email alone can activate these dormant users, it demonstrates the maximum reach of the campaign beyond already-engaged cohorts.
+
+\subsection{Email Templates}
+
+Ten ML-generated email templates were prepared, organized across three strategic
+content categories designed to address the identified funding barriers:
+
+\begin{table}[H]
+  \centering
+  \caption{Email Template Registry}
+  \label{tab:templates}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{@{}lL{6cm}L{5.5cm}@{}}
+    \toprule
+    \textbf{ID} & \textbf{Template Name} & \textbf{Content Category} \\
+    \midrule
+    0 & \colname{ml\_funding\_enables\_investing}    & Knowledge: how funding enables investment \\
+    1 & \colname{ml\_investing\_starts\_here}        & Onboarding: getting started guide \\
+    2 & \colname{ml\_explore\_the\_app\_investing}   & App exploration (investment features) \\
+    3 & \colname{ml\_funding\_faq}                   & \textbf{Trust}: FAQ about the funding process \\
+    4 & \colname{ml\_user\_clustering\_emails\_fracs} & Personalization: ML cluster-based content \\
+    5 & \colname{ml\_funding\_is\_safe}              & Trust \& Safety: security assurances \\
+    6 & \colname{ml\_picking\_an\_investment}        & Knowledge: investment selection guidance \\
+    7 & \colname{ml\_investing\_101}                 & Education: investing basics \\
+    8 & \colname{ml\_diversified\_portfolio}         & Knowledge: portfolio diversification \\
+    9 & \colname{ml\_explore\_the\_app\_list}        & App exploration (browsing features) \\
+    \bottomrule
+  \end{tabular}%
+  }
+\end{table}
+
+\subsection{Delivery Strategy \& Treatment Arms}
+
+Each of the 12 behavioral segments is split into two frequency sub-groups:
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Daily (\texttt{\_D})}: Emails sent on Days 0 through 9 (one per day,
+    for 10 consecutive days starting 2020-11-30).
+  \item \textbf{Twice-a-week (\texttt{\_W})}: Emails sent on a Monday/Friday schedule —
+    Days 0, 4, 7, 11, 14, 18, 21, 25, 28, 32 — spanning approximately 5 weeks.
+\end{itemize}
+
+This yields $12 \times 2 = \mathbf{24}$ treatment arms. Within each treatment arm,
+the order of the 10 email templates is \textbf{randomized without replacement} for
+each individual user. This ensures the experiment explores the full combinatorial
+space of email sequences rather than testing a fixed canonical order, preventing
+any single template from being systematically positioned first or last.
+
+\subsection{Control Groups}
+
+For each of the 12 behavioral segments, a \textbf{matched control group} of users
+with identical segmentation rules received no emails during the experiment period.
+Pre-computed control group funding and link rates (stored in
+\texttt{control\_groups\_rate.csv}) serve as the baseline for A/B significance testing.
+
+The control group design is critical for \textbf{causal identification}: it allows us
+to disentangle organic conversion (users who would have funded regardless of email)
+from email-attributable incremental lift.
+
+\subsection{Statistical Hypothesis Framework}
+
+For each treatment arm $g$, we test the one-sided hypothesis:
+
+\begin{align}
+  H_0 &: p_{\text{treatment},g} \leq p_{\text{control},g} \\
+  H_1 &: p_{\text{treatment},g} > p_{\text{control},g}
+\end{align}
+
+where $p$ denotes the funding rate (proportion of users who funded during the
+experiment window). The test statistic is a one-sided proportions Z-test at
+significance level $\alpha = 0.05$:
+
+\begin{equation}
+  Z = \frac{\hat{p}_{\text{treat}} - p_{\text{control}}}%
+      {\sqrt{p_{\text{control}}(1 - p_{\text{control}}) / n_{\text{treat}}}}
+\end{equation}
+
+\noindent where $Z$ is the standardized test statistic, $\hat{p}_{\text{treat}}$ is the
+observed funding rate in the treatment arm, $p_{\text{control}}$ is the segment-specific
+baseline rate sourced from \colname{control\_groups\_rate.csv}, and $n_{\text{treat}}$ is
+the number of approved users assigned to the treatment arm.
 
 \clearpage
 % ─────────────────────────────────────────────────────────────────────────────
