@@ -1,0 +1,40 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+.venv
+venv/
+
+# LaTeX build artifacts
+reports/*.aux
+reports/*.log
+reports/*.out
+reports/*.toc
+reports/*.fls
+reports/*.fdb_latexmk
+reports/*.synctex.gz
+reports/*.bbl
+reports/*.blg
+
+# Large/confidential source files — not for public repo
+Email.zip
+*.docx
+*.pdf
+
+# Checkpoint notebooks
+.ipynb_checkpoints/
+
+# Large data files exceeding GitHub 100MB limit
+# See data/README.md for download instructions
+data/email_events.csv
+data/user_events.csv

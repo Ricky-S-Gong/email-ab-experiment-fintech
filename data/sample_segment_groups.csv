@@ -1,0 +1,13 @@
+,group_id,approved_within6M_flag,link_flag,recent_activity_flag(20days),5day_trade_flag,user_uuid,group_name
+0,0,False,False,False,False,4418550,ML_unfund_exp_control
+1,1,False,False,True,False,314921,20D_Act
+2,2,False,False,True,True,409786,20D_Act-5D_Act
+3,3,False,True,False,False,941341,link
+4,4,False,True,True,False,102541,link-20D_Act
+5,5,False,True,True,True,136513,link-20D_Act-5D_Act
+6,6,True,False,False,False,814827,6M_App
+7,7,True,False,True,False,218938,6M_App-20D_Act
+8,8,True,False,True,True,233445,6M_App-20D_Act-5D_Act
+9,9,True,True,False,False,127008,6M_App-link
+10,10,True,True,True,False,47883,6M_App-link-20D_Act
+11,11,True,True,True,True,69697,6M_App-link-20D_Act-5D_Act
