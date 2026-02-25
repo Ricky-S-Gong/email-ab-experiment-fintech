@@ -101,7 +101,7 @@ email-ab-experiment-fintech/
 │   └── funnel_analysis.png             # Email open → link → fund conversion funnel
 │
 ├── reports/
-│   ├── Report.tex                      # Full academic-style analysis report (LaTeX source)
+│   ├── Report.tex                      # Executive report (LaTeX source)
 │   └── Report.pdf                      # Compiled PDF report (29 pages)
 │
 └── README.md
@@ -422,7 +422,7 @@ email-ab-experiment-fintech/
 │
 ├── assets/                             # 所有可视化输出图表（9 张）
 ├── reports/
-│   ├── Report.tex                      # 完整学术分析报告（LaTeX 源文件）
+│   ├── Report.tex                      # 执行摘要报告（LaTeX 源文件）
 │   └── Report.pdf                      # 编译后的 PDF 报告（29 页）
 │
 └── README.md
