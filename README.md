@@ -166,8 +166,9 @@ The experiment uses five structured datasets that form a clear pipeline from des
 
 ---
 
-### File 3: `user_events.csv` — Primary Analysis Table *(large file, not in git)*
+### File 3: `user_events.csv` — Primary Analysis Table
 **Shape:** 480,000 rows × 22 columns · **Role:** One row per experiment user with summarized email status, account outcome timestamps, and platform activity metrics. This is the central table for all analyses.
+**Download:** [⬇ user_events.csv (81 MB)](https://github.com/Ricky-S-Gong/email-ab-experiment-fintech/releases/download/v1.0.0/user_events.csv)
 
 #### Identifiers & Group Assignment
 | Column | Type | Description |
@@ -208,8 +209,9 @@ Each `ml_*` column stores the **highest-intent action** that user took on that s
 
 ---
 
-### File 4: `email_events.csv` — Raw Post-Office Event Log *(large file, not in git)*
+### File 4: `email_events.csv` — Raw Post-Office Event Log
 **Shape:** 9,553,330 rows × 6 columns · **Role:** Raw event stream from the email delivery system. One row per event (not per user), enabling time-series delivery monitoring.
+**Download:** [⬇ email_events.csv (871 MB)](https://github.com/Ricky-S-Gong/email-ab-experiment-fintech/releases/download/v1.0.0/email_events.csv)
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -321,18 +323,24 @@ The main analysis is in `notebooks/Project-3-AB-testing.ipynb`, structured as:
 ## How to Run
 
 ```bash
-# Clone the repository
-git clone https://github.com/<your-username>/email-ab-experiment-fintech.git
+# 1. Clone the repository
+git clone https://github.com/Ricky-S-Gong/email-ab-experiment-fintech.git
 cd email-ab-experiment-fintech
 
-# Install dependencies
+# 2. Download the large data files from GitHub Releases
+gh release download v1.0.0 --dir data/
+# Or with wget (no GitHub CLI needed):
+# wget -P data/ https://github.com/Ricky-S-Gong/email-ab-experiment-fintech/releases/download/v1.0.0/user_events.csv
+# wget -P data/ https://github.com/Ricky-S-Gong/email-ab-experiment-fintech/releases/download/v1.0.0/email_events.csv
+
+# 3. Install dependencies
 pip install pandas==2.2.2 numpy==1.26.4 matplotlib==3.9.2 seaborn==0.14.2 statsmodels==0.14.2
 
-# Launch Jupyter and open the main notebook
+# 4. Launch Jupyter and open the main notebook
 jupyter notebook notebooks/Project-3-AB-testing.ipynb
 ```
 
-All data files are included in the `data/` directory. No external downloads required.
+> **Minimum setup:** Only `user_events.csv` is needed for all core analyses. `email_events.csv` (871 MB) is only used for the event-volume breakdown chart in Section 3.
 
 ---
 
@@ -478,15 +486,21 @@ email-ab-experiment-fintech/
 ## 运行方式
 
 ```bash
-# 克隆仓库
-git clone https://github.com/<your-username>/email-ab-experiment-fintech.git
+# 1. 克隆仓库
+git clone https://github.com/Ricky-S-Gong/email-ab-experiment-fintech.git
 cd email-ab-experiment-fintech
 
-# 安装依赖
+# 2. 从 GitHub Releases 下载大型数据文件
+gh release download v1.0.0 --dir data/
+# 或用 wget（无需 GitHub CLI）：
+# wget -P data/ https://github.com/Ricky-S-Gong/email-ab-experiment-fintech/releases/download/v1.0.0/user_events.csv
+# wget -P data/ https://github.com/Ricky-S-Gong/email-ab-experiment-fintech/releases/download/v1.0.0/email_events.csv
+
+# 3. 安装依赖
 pip install pandas==2.2.2 numpy==1.26.4 matplotlib==3.9.2 seaborn==0.14.2 statsmodels==0.14.2
 
-# 启动 Jupyter 并打开主分析笔记本
+# 4. 启动 Jupyter 并打开主分析笔记本
 jupyter notebook notebooks/Project-3-AB-testing.ipynb
 ```
 
-所有数据文件均已包含在 `data/` 目录中，无需额外下载。
+> **最小配置：** 核心分析仅需 `user_events.csv`。`email_events.csv`（871 MB）仅用于第 3 节的邮件事件量图表。
