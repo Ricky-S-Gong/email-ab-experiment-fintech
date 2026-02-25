@@ -216,25 +216,27 @@ historical platform activity data:
   \centering
   \caption{User Segment Definitions (12 Behavioral Groups)}
   \label{tab:segments}
+  \resizebox{\textwidth}{!}{%
   \begin{tabular}{@{}lccccr@{}}
     \toprule
-    \textbf{Segment Name} & \textbf{Appr. <6M} & \textbf{Bank Linked} &
-    \textbf{Active 20d} & \textbf{Trade 5d} & \textbf{Total Pool} \\
+    \textbf{Segment Name} & \textbf{Approved $<$6M} & \textbf{Bank Linked} &
+    \textbf{Active 20d} & \textbf{Trade 5d} & \textbf{Total Pool Size} \\
     \midrule
-    ML\_unfund\_exp\_control & $\times$ & $\times$ & $\times$ & $\times$ & 4,343,086 \\
-    20D\_Act                 & $\times$ & $\times$ & $\checkmark$ & $\times$ & 360,430 \\
-    20D\_Act-5D\_Act         & $\times$ & $\times$ & $\checkmark$ & $\checkmark$ & 374,603 \\
-    link                     & $\times$ & $\checkmark$ & $\times$ & $\times$ & 921,347 \\
-    link-20D\_Act            & $\times$ & $\checkmark$ & $\checkmark$ & $\times$ & 115,686 \\
-    link-20D\_Act-5D\_Act    & $\times$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & 123,536 \\
-    6M\_App                  & $\checkmark$ & $\times$ & $\times$ & $\times$ & 845,514 \\
-    6M\_App-20D\_Act         & $\checkmark$ & $\times$ & $\checkmark$ & $\times$ & 227,223 \\
-    6M\_App-20D\_Act-5D\_Act & $\checkmark$ & $\times$ & $\checkmark$ & $\checkmark$ & 210,603 \\
-    6M\_App-link             & $\checkmark$ & $\checkmark$ & $\times$ & $\times$ & 135,009 \\
-    6M\_App-link-20D\_Act    & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\times$ & 53,211 \\
-    6M\_App-link-20D\_Act-5D\_Act & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ & 65,976 \\
+    ML\_unfund\_exp\_control      & $\times$     & $\times$     & $\times$     & $\times$     & 4,343,086 \\
+    20D\_Act                      & $\times$     & $\times$     & $\checkmark$ & $\times$     &   360,430 \\
+    20D\_Act-5D\_Act              & $\times$     & $\times$     & $\checkmark$ & $\checkmark$ &   374,603 \\
+    link                          & $\times$     & $\checkmark$ & $\times$     & $\times$     &   921,347 \\
+    link-20D\_Act                 & $\times$     & $\checkmark$ & $\checkmark$ & $\times$     &   115,686 \\
+    link-20D\_Act-5D\_Act         & $\times$     & $\checkmark$ & $\checkmark$ & $\checkmark$ &   123,536 \\
+    6M\_App                       & $\checkmark$ & $\times$     & $\times$     & $\times$     &   845,514 \\
+    6M\_App-20D\_Act              & $\checkmark$ & $\times$     & $\checkmark$ & $\times$     &   227,223 \\
+    6M\_App-20D\_Act-5D\_Act      & $\checkmark$ & $\times$     & $\checkmark$ & $\checkmark$ &   210,603 \\
+    6M\_App-link                  & $\checkmark$ & $\checkmark$ & $\times$     & $\times$     &   135,009 \\
+    6M\_App-link-20D\_Act         & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\times$     &    53,211 \\
+    6M\_App-link-20D\_Act-5D\_Act & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ &    65,976 \\
     \bottomrule
-  \end{tabular}
+  \end{tabular}%
+  }
 \end{table}
 
 \subsection{Email Templates}
@@ -316,63 +318,295 @@ significance level $\alpha = 0.05$:
 
 \subsection{Dataset Overview}
 
-The analysis uses five structured datasets:
+The analysis pipeline ingests five structured datasets produced at different stages
+of the experiment lifecycle — from experiment design through delivery tracking to
+outcome measurement. Table~\ref{tab:datasets} provides a high-level summary; the
+following subsections document each file's schema, column semantics, and role in
+the analysis.
 
 \begin{table}[H]
   \centering
   \caption{Dataset Summary}
   \label{tab:datasets}
-  \begin{tabular}{@{}L{4.5cm}rL{6cm}@{}}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{@{}L{5.2cm}C{2.2cm}L{7.5cm}@{}}
     \toprule
-    \textbf{File} & \textbf{Shape} & \textbf{Description} \\
+    \textbf{File} & \textbf{Shape} & \textbf{Role in Analysis} \\
     \midrule
-    \texttt{sample\_segment\_groups.csv}   & 12 $\times$ 8    & Segment definitions with user counts \\
-    \texttt{sample\_uuid\_email\_order.csv} & 480,000 $\times$ 13 & Per-user randomized email delivery schedule \\
-    \texttt{email\_events.csv}             & 9,553,330 $\times$ 6 & Raw email interaction events from delivery system \\
-    \texttt{user\_events.csv}             & 480,000 $\times$ 22 & User-level email status and outcome metrics \\
-    \texttt{control\_groups\_rate.csv}     & 12 $\times$ 6    & Pre-computed control group baseline rates \\
+    \texttt{sample\_segment\_groups.csv}    & $12 \times 8$          & Defines the 12 behavioral user segments; maps segment IDs to feature flags and pool sizes \\
+    \texttt{sample\_uuid\_email\_order.csv} & $480{,}000 \times 13$  & Per-user randomized email delivery schedule; used for time-series pivot and delivery-order analysis \\
+    \texttt{email\_events.csv}              & $9{,}553{,}330 \times 6$ & Raw Post-Office event log; used for deliverability health checks and event volume breakdown \\
+    \texttt{user\_events.csv}               & $480{,}000 \times 22$  & Primary analysis table: per-user email status, account outcomes, and activity metrics \\
+    \texttt{control\_groups\_rate.csv}      & $12 \times 6$          & Pre-computed control group baseline funding and link rates; used as denominator in A/B z-tests \\
     \bottomrule
-  \end{tabular}
+  \end{tabular}%
+  }
 \end{table}
 
-\subsection{Key Variables}
+% ── File 1 ───────────────────────────────────────────────────────────────────
+\subsection{\texttt{sample\_segment\_groups.csv} — Experiment Segmentation Design}
 
-\textbf{Email interaction status} (in \texttt{user\_events.csv}): For each of the 10
-email templates, users carry one of the following status values: \texttt{delivered},
-\texttt{open}, \texttt{unsubscribe}, \texttt{spamreport}, or \texttt{NaN} (not yet
-sent). The status represents the \textit{highest-intent action} taken on that email.
-
-\textbf{Outcome variables}:
-\begin{itemize}[leftmargin=2em]
-  \item \texttt{first\_funded\_at}: Timestamp of first funding event (primary outcome)
-  \item \texttt{first\_linked\_bank\_account\_at}: Timestamp of bank account linkage
-    (leading indicator for funding)
-  \item \texttt{5d/20d\_trading\_avg\_event\_count}: Trading activity proxies
-    (user engagement signal)
-\end{itemize}
-
-\textbf{Email event log} (in \texttt{email\_events.csv}): Raw events from the
-Post-Office delivery system totaling 9.55M rows, including:
+This file encodes the \textbf{experiment design intent}: it lists the 12 behavioral
+user segments, the four binary feature flags that define each segment, and the total
+number of users available in the full population for each segment (prior to the
+40,000-user sampling step).
 
 \begin{table}[H]
   \centering
-  \caption{Email Event Volume Breakdown}
-  \label{tab:events}
-  \begin{tabular}{@{}lrl@{}}
+  \caption{Schema: \texttt{sample\_segment\_groups.csv}}
+  \label{tab:schema_segments}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{@{}L{5.5cm}L{2cm}L{7.5cm}@{}}
     \toprule
-    \textbf{Event Type} & \textbf{Count} & \textbf{Meaning} \\
+    \textbf{Column} & \textbf{Type} & \textbf{Description} \\
     \midrule
-    processed    & 4,208,119 & Accepted for delivery \\
-    delivered    & 4,191,336 & Successfully delivered to inbox \\
-    open         &   870,651 & Recipient opened the email \\
-    dropped      &   241,805 & Suppressed (unsubscribe list, etc.) \\
-    bounce       &    18,166 & Hard or soft bounce \\
-    deferred     &    12,059 & Temporarily delayed delivery \\
-    unsubscribe  &    10,894 & User opted out of email \\
-    spamreport   &       300 & User reported as spam \\
+    \texttt{group\_id}                      & int   & Integer ID 0--11 identifying the segment \\
+    \texttt{approved\_within6M\_flag}        & bool  & True if user's account was approved within the past 6 months; proxy for recency of intent \\
+    \texttt{link\_flag}                      & bool  & True if user has linked at least one bank account; prerequisite for funding \\
+    \texttt{recent\_activity\_flag(20days)}  & bool  & True if user had any platform activity (login, browse, etc.) in the past 20 days \\
+    \texttt{5day\_trade\_flag}               & bool  & True if user executed at least one trade in the past 5 days; strongest engagement signal \\
+    \texttt{user\_uuid}                      & int   & \textbf{Note:} this column stores the \textit{count} of users in the full population pool for that segment, \textbf{not} an individual user ID \\
+    \texttt{group\_name}                     & str   & Human-readable segment label constructed by concatenating the active flags (e.g., \texttt{6M\_App-link-20D\_Act}) \\
     \bottomrule
-  \end{tabular}
+  \end{tabular}%
+  }
 \end{table}
+
+\textbf{Design note}: The four flags form a strict behavioral hierarchy from lowest
+to highest engagement intent: no signals $\to$ recent activity $\to$ bank linked
+$\to$ recently approved $\to$ active trader. Segments at the higher end of this
+hierarchy (e.g., \texttt{6M\_App-link-20D\_Act-5D\_Act}) represent users who are
+functionally ``one step away'' from funding, while the baseline
+\texttt{ML\_unfund\_exp\_control} segment captures the broad cold-start population.
+
+% ── File 2 ───────────────────────────────────────────────────────────────────
+\subsection{\texttt{sample\_uuid\_email\_order.csv} — Per-User Delivery Schedule}
+
+This is the \textbf{randomization manifest}: for each of the 480,000 experiment
+users, it records which email template was assigned to each delivery position
+(order\_0 through order\_9). This table is the key artifact produced by the
+experiment's scheduling pipeline before any emails were sent.
+
+\begin{table}[H]
+  \centering
+  \caption{Schema: \texttt{sample\_uuid\_email\_order.csv}}
+  \label{tab:schema_order}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{@{}L{3.5cm}L{2cm}L{9.5cm}@{}}
+    \toprule
+    \textbf{Column} & \textbf{Type} & \textbf{Description} \\
+    \midrule
+    \texttt{user\_uuid} & str  & Unique user identifier in the format \texttt{id\_\{integer\}}; primary key for joining with \texttt{user\_events.csv} \\
+    \texttt{group\_id}  & int  & Integer segment ID 0--23 (24 groups = 12 segments $\times$ 2 frequencies) \\
+    \texttt{group\_name}& str  & Full treatment group label, e.g., \texttt{20D\_Act\_D} (daily) or \texttt{6M\_App\_W} (twice-a-week) \\
+    \texttt{order\_0}   & int  & Index (0--9) into \texttt{PO\_number\_list} of the email sent at delivery position 0 (first send) \\
+    \texttt{order\_1}   & int  & Email index for delivery position 1 (second send) \\
+    $\vdots$ & $\vdots$ & $\vdots$ \\
+    \texttt{order\_9}   & int  & Email index for delivery position 9 (tenth/final send) \\
+    \bottomrule
+  \end{tabular}%
+  }
+\end{table}
+
+\textbf{Randomization mechanics}: Each user's \texttt{order\_0} through
+\texttt{order\_9} values form a permutation of $\{0, 1, \ldots, 9\}$, drawn
+without replacement. This ensures:
+(a) every user receives all 10 templates exactly once,
+(b) no template is systematically over-represented at early or late delivery positions,
+and (c) the time-series open rate analysis reflects the effect of position in sequence
+rather than the effect of specific template content.
+
+\textbf{How delivery timing maps to order positions}:
+For \texttt{\_D} (daily) groups, \texttt{order\_0} $=$ Day~0, \texttt{order\_1}
+$=$ Day~1, \ldots, \texttt{order\_9} $=$ Day~9.
+For \texttt{\_W} (twice-a-week) groups, \texttt{order\_0} $=$ Day~0 (Mon),
+\texttt{order\_1} $=$ Day~4 (Fri), \texttt{order\_2} $=$ Day~7 (Mon), and so on
+through \texttt{order\_9} $=$ Day~32.
+
+% ── File 3 ───────────────────────────────────────────────────────────────────
+\subsection{\texttt{user\_events.csv} — Primary Analysis Table}
+
+This is the \textbf{central table for all analyses}. It is a wide, user-level
+snapshot produced at the end of the observation window, containing: (i) each
+user's summarized email interaction status across all 10 templates, (ii) account
+lifecycle timestamps used to derive outcome metrics, and (iii) platform engagement
+activity metrics used as behavioral covariates.
+
+\begin{table}[H]
+  \centering
+  \caption{Schema: \texttt{user\_events.csv} (480,000 rows $\times$ 22 columns)}
+  \label{tab:schema_user_events}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{@{}L{5.8cm}L{2cm}L{8.5cm}@{}}
+    \toprule
+    \textbf{Column} & \textbf{Type} & \textbf{Description} \\
+    \midrule
+    \multicolumn{3}{@{}l}{\textit{Identifiers \& Group Assignment}} \\
+    \texttt{user\_uuid}   & str & Unique user ID; primary key \\
+    \texttt{group\_name}  & str & Treatment arm (24 possible values, e.g., \texttt{6M\_App\_D}) \\
+    \midrule
+    \multicolumn{3}{@{}l}{\textit{Email Interaction Status (one column per template)}} \\
+    \texttt{ml\_funding\_enables\_investing}    & str/NaN & Summarized email status \\
+    \texttt{ml\_investing\_starts\_here}         & str/NaN & Summarized email status \\
+    \texttt{ml\_explore\_the\_app\_investing}    & str/NaN & Summarized email status \\
+    \texttt{ml\_funding\_faq}                    & str/NaN & Summarized email status \\
+    \texttt{ml\_user\_clustering\_emails\_fracs} & str/NaN & Summarized email status \\
+    \texttt{ml\_funding\_is\_safe}               & str/NaN & Summarized email status \\
+    \texttt{ml\_picking\_an\_investment}         & str/NaN & Summarized email status \\
+    \texttt{ml\_investing\_101}                  & str/NaN & Summarized email status \\
+    \texttt{ml\_diversified\_portfolio}          & str/NaN & Summarized email status \\
+    \texttt{ml\_explore\_the\_app\_list}         & str/NaN & Summarized email status \\
+    \midrule
+    \multicolumn{3}{@{}l}{\textit{Account Lifecycle Outcomes (primary and secondary outcome variables)}} \\
+    \texttt{approved\_at}                   & datetime & Timestamp when the user's account was approved by compliance/KYC \\
+    \texttt{first\_funded\_at}               & datetime & Timestamp of the user's first qualifying deposit (\textbf{primary outcome}); NaN = not yet funded \\
+    \texttt{first\_linked\_bank\_account\_at} & datetime & Timestamp of first bank account linkage (\textbf{secondary outcome}); NaN = not yet linked \\
+    \midrule
+    \multicolumn{3}{@{}l}{\textit{Platform Activity Metrics (behavioral covariates)}} \\
+    \texttt{5d\_trading\_avg\_event\_count}    & float & Average number of trading events per day over the past 5 days; NaN = no recent trading \\
+    \texttt{2d\_non\_trading\_avg\_event\_count} & float & Average non-trading app events (browse, login) per day over the past 2 days \\
+    \texttt{20d\_trading\_avg\_event\_count}   & float & Average trading events per day over the past 20 days; broader engagement window \\
+    \texttt{8d\_non\_trading\_avg\_event\_count} & float & Average non-trading events per day over the past 8 days \\
+    \texttt{1d\_trading\_avg\_event\_count}    & float & Average trading events on the most recent day; most sensitive recency signal \\
+    \texttt{1d\_non\_trading\_avg\_event\_count} & float & Average non-trading events on the most recent day \\
+    \texttt{num\_received\_email}              & int   & Total number of emails successfully delivered to this user (0--10); used to filter active treatment participants \\
+    \bottomrule
+  \end{tabular}%
+  }
+\end{table}
+
+\textbf{Email status encoding}: Each of the 10 \texttt{ml\_*} columns stores the
+\textit{highest-intent action} the user took on that email, following the hierarchy:
+\begin{equation*}
+  \texttt{NaN} < \texttt{delivered} < \texttt{open} \quad
+  \text{and} \quad
+  \texttt{NaN} < \texttt{delivered} < \texttt{unsubscribe} / \texttt{spamreport}
+\end{equation*}
+A value of \texttt{NaN} means the email was either not yet sent to this user (e.g.,
+weekly groups whose order\_9 is pending) or was dropped before delivery. This
+encoding is critical: computing ``open rate'' requires using \texttt{notnull()} to
+identify delivered users and \texttt{== `open'} to identify openers, rather than
+parsing a separate event log.
+
+\textbf{Outcome derivation}: Funding status is derived from \texttt{first\_funded\_at}:
+a user is counted as ``funded'' if and only if
+\texttt{first\_funded\_at.notna()} returns True, indicating the deposit occurred
+within the observation window. Linking status is derived analogously from
+\texttt{first\_linked\_bank\_account\_at}.
+
+% ── File 4 ───────────────────────────────────────────────────────────────────
+\subsection{\texttt{email\_events.csv} — Raw Post-Office Event Log}
+
+This is the \textbf{raw event stream} produced by the email delivery system
+(internally referred to as ``Post Office''), capturing every interaction event
+at the individual email-send level. Unlike \texttt{user\_events.csv}, which
+provides one summarized row per user, this file contains one row per event,
+making it significantly larger (9.55M rows).
+
+\begin{table}[H]
+  \centering
+  \caption{Schema: \texttt{email\_events.csv} (9,553,330 rows $\times$ 6 columns)}
+  \label{tab:schema_email_events}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{@{}L{5.8cm}L{2cm}L{8.5cm}@{}}
+    \toprule
+    \textbf{Column} & \textbf{Type} & \textbf{Description} \\
+    \midrule
+    \texttt{stitch\_email\_events.category} & str  & JSON-like string encoding the email template name and sender system (e.g., \texttt{["ml\_funding\_faq","post-office"]}); template name must be parsed out \\
+    \texttt{stitch\_email\_events.dt\_date} & str  & Date of the event in \texttt{YYYY-MM-DD} format; enables time-series event analysis \\
+    \texttt{user\_uuid}                     & str  & User identifier; joins to \texttt{user\_events.csv} and \texttt{sample\_uuid\_email\_order.csv} \\
+    \texttt{event}                          & str  & Event type (see Table~\ref{tab:events} for all values and volumes) \\
+    \texttt{reason}                         & str  & For bounce/drop events, the technical reason string from the ESP; NaN for normal events \\
+    \texttt{stitch\_email\_events.count\_events} & int & Number of times this specific event occurred for this user-email-date combination (usually 1; may be $>1$ for \texttt{open} repeat opens) \\
+    \bottomrule
+  \end{tabular}%
+  }
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption{Email Event Type Reference}
+  \label{tab:events}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{@{}L{2.5cm}R{2.5cm}L{3.5cm}L{6.5cm}@{}}
+    \toprule
+    \textbf{Event} & \textbf{Count} & \textbf{Rate vs.\ Delivered} & \textbf{Business Meaning} \\
+    \midrule
+    \texttt{processed}   & 4,208,119 & 100.4\%$^*$ & Email accepted by the ESP for delivery attempt \\
+    \texttt{delivered}   & 4,191,336 & 100\% (base) & Successfully delivered to recipient's inbox \\
+    \texttt{open}        &   870,651 & 20.8\%       & Recipient opened the email (pixel-tracked); indicates subject line resonance \\
+    \texttt{dropped}     &   241,805 &  5.8\%       & Suppressed before send; reasons include prior unsubscribes, spam complaints, or invalid addresses \\
+    \texttt{bounce}      &    18,166 &  0.43\%      & Delivery failure; hard bounce (invalid address) or soft bounce (mailbox full); high rates damage sender reputation \\
+    \texttt{deferred}    &    12,059 &  0.29\%      & Temporarily delayed by receiving server; usually resolves on retry \\
+    \texttt{unsubscribe} &    10,894 &  0.26\%      & User clicked the unsubscribe link; removes them from future campaigns; \textbf{counter-metric} \\
+    \texttt{spamreport}  &       300 &  0.007\%     & User marked as spam; critical counter-metric — ESP thresholds typically at $<$0.10\%; damages domain reputation \\
+    \bottomrule
+    \multicolumn{4}{l}{\small $^*$ Slight excess due to deferred events being re-attempted and double-counted.}
+  \end{tabular}%
+  }
+\end{table}
+
+\textbf{Usage note}: In the primary analysis, \texttt{user\_events.csv} is
+preferred over this raw log because it provides a de-duplicated, user-level
+summary. This file is used primarily for (a) the negative-effects heatmap and
+(b) the event volume breakdown chart in Section~\ref{sec:negative}.
+
+% ── File 5 ───────────────────────────────────────────────────────────────────
+\subsection{\texttt{control\_groups\_rate.csv} — Control Group Baselines}
+
+This file stores the \textbf{pre-computed baseline conversion rates} for the 12
+matched control groups — users who share the same behavioral segment definitions
+but received zero emails during the experiment window. It is the direct comparator
+for the A/B significance testing in Section~\ref{sec:ab}.
+
+\begin{table}[H]
+  \centering
+  \caption{Schema: \texttt{control\_groups\_rate.csv} (12 rows $\times$ 6 columns)}
+  \label{tab:schema_control}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{@{}L{5.2cm}L{2cm}L{8.5cm}@{}}
+    \toprule
+    \textbf{Column} & \textbf{Type} & \textbf{Description} \\
+    \midrule
+    \texttt{group\_name}            & str   & Segment label with \texttt{\_D} suffix (one row per segment; both \texttt{\_D} and \texttt{\_W} treatment arms reference the same control row via name matching) \\
+    \texttt{num\_users\_in\_control} & int   & Total number of users in the control group for this segment (these users had the same segment flags but were not enrolled in email treatment) \\
+    \texttt{num\_funded\_in\_control} & int  & Number of control users who funded their account during the observation window; used as the numerator for $p_{\text{control}}$ \\
+    \texttt{funding\_rate\_in\_control} & float & $= \texttt{num\_funded} / \texttt{num\_users}$; the baseline funding rate used as the null hypothesis value $p_0$ in the proportions z-test \\
+    \texttt{num\_link\_in\_control}  & int   & Number of control users who linked a bank account during the window \\
+    \texttt{link\_rate\_in\_control} & float & Baseline bank-link rate for the control group; used for incremental link-rate analysis \\
+    \bottomrule
+  \end{tabular}%
+  }
+\end{table}
+
+\textbf{Important nuance}: Control group rates for link-related segments
+(\texttt{link}, \texttt{6M\_App-link}, etc.) show \texttt{link\_rate\_in\_control = 1.0},
+since all users in these segments had already linked their bank account by definition
+(the segment filter \texttt{link\_flag = True}). These groups are excluded from
+incremental link-rate analysis but remain valid for funding-rate comparison.
+
+% ── Data Relationships ────────────────────────────────────────────────────────
+\subsection{Data Relationships \& Join Logic}
+
+Figure~\ref{fig:data_erd} conceptually illustrates how the five datasets relate:
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{\texttt{sample\_segment\_groups.csv}} defines segments referenced by
+    \texttt{group\_id} and \texttt{group\_name} in both \texttt{sample\_uuid\_email\_order.csv}
+    and \texttt{user\_events.csv}.
+  \item \textbf{\texttt{sample\_uuid\_email\_order.csv}} and \textbf{\texttt{user\_events.csv}}
+    share \texttt{user\_uuid} as the primary join key (one row per user in both).
+    The merge produces the ``big table'' used for time-series analysis: schedule
+    columns (\texttt{order\_0}\ldots\texttt{order\_9}) are mapped to email names,
+    then email status columns from \texttt{user\_events.csv} are looked up by
+    template name to yield order-position-indexed open rates.
+  \item \textbf{\texttt{email\_events.csv}} joins to \texttt{user\_events.csv} via
+    \texttt{user\_uuid}, but is used independently for raw event monitoring.
+  \item \textbf{\texttt{control\_groups\_rate.csv}} joins to the aggregated treatment
+    metrics table via \texttt{group\_name} (with \texttt{\_W} treatment groups
+    matched to their \texttt{\_D} control counterpart, since control groups are
+    maintained at the segment level, not the frequency level).
+\end{enumerate}
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Email Open Rate Analysis}
@@ -445,6 +679,7 @@ no active engagement history are harder to activate via email alone.
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{Negative Effects Analysis}
+\label{sec:negative}
 % ─────────────────────────────────────────────────────────────────────────────
 
 \subsection{Motivation}
@@ -565,6 +800,7 @@ profile of the experiment population:
 
 % ─────────────────────────────────────────────────────────────────────────────
 \section{A/B Testing: Causal Impact on Funding Rate}
+\label{sec:ab}
 % ─────────────────────────────────────────────────────────────────────────────
 
 \subsection{Results}

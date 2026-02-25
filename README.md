@@ -84,9 +84,10 @@ email-ab-experiment-fintech/
 ├── data/
 │   ├── sample_segment_groups.csv       # 12 user segment definitions with user counts
 │   ├── sample_uuid_email_order.csv     # 480K users × randomized email delivery schedule
-│   ├── email_events.csv                # Raw email events (9.5M rows) from delivery system
-│   ├── user_events.csv                 # User-level email status + outcome metrics
-│   └── control_groups_rate.csv         # Pre-computed funding/link rates for control groups
+│   ├── email_events.csv                # Raw email events (9.5M rows) — NOT in git (871 MB)
+│   ├── user_events.csv                 # User-level email status + outcome metrics — NOT in git (81 MB)
+│   ├── control_groups_rate.csv         # Pre-computed funding/link rates for control groups
+│   └── README.md                       # Column reference for large excluded files
 │
 ├── assets/
 │   ├── open_rate_heatmap.png           # Email open rate: group × template heatmap
@@ -100,10 +101,166 @@ email-ab-experiment-fintech/
 │   └── funnel_analysis.png             # Email open → link → fund conversion funnel
 │
 ├── reports/
-│   └── Report.tex                      # Full academic-style analysis report (LaTeX)
+│   ├── Report.tex                      # Full academic-style analysis report (LaTeX source)
+│   └── Report.pdf                      # Compiled PDF report (29 pages)
 │
-├── README.md
-└── CLAUDE.md                           # Developer guidance for Claude Code
+└── README.md
+```
+
+---
+
+## Data Dictionary
+
+The experiment uses five structured datasets that form a clear pipeline from design to outcome measurement. Below is a complete reference for every file and every column.
+
+---
+
+### File 1: `sample_segment_groups.csv` — Experiment Segmentation Design
+**Shape:** 12 rows × 8 columns · **Role:** Defines the 12 behavioral user segments and their population sizes.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `group_id` | int | Integer ID 0–11 identifying each segment |
+| `approved_within6M_flag` | bool | `True` if user's account was approved within the past 6 months — proxy for recency of onboarding intent |
+| `link_flag` | bool | `True` if user has linked at least one bank account — prerequisite step before funding |
+| `recent_activity_flag(20days)` | bool | `True` if user had any platform activity (login, browse, watch) in the past 20 days |
+| `5day_trade_flag` | bool | `True` if user executed at least one trade in the past 5 days — the strongest behavioral engagement signal |
+| `user_uuid` | int | **Note:** Stores the *count* of users in the full population pool for that segment, **not** an individual user ID |
+| `group_name` | str | Human-readable label built by concatenating active flags, e.g. `6M_App-link-20D_Act` |
+
+**Interpretation:** The four binary flags create a behavioral engagement hierarchy. Segments at the top (e.g., `6M_App-link-20D_Act-5D_Act`) are intent-rich users who are functionally one step from funding. The baseline `ML_unfund_exp_control` segment has no distinguishing behavioral signals.
+
+---
+
+### File 2: `sample_uuid_email_order.csv` — Per-User Delivery Schedule
+**Shape:** 480,000 rows × 13 columns · **Role:** The randomization manifest — records exactly which email was assigned to each delivery position for each user.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `user_uuid` | str | Unique user identifier in the format `id_{integer}` — primary key for joining with `user_events.csv` |
+| `group_id` | int | Integer group ID 0–23 (24 groups = 12 segments × 2 frequencies) |
+| `group_name` | str | Full treatment arm label, e.g. `20D_Act_D` (daily) or `6M_App_W` (twice-a-week) |
+| `order_0` | int | Index (0–9) into `PO_number_list` of the email assigned to delivery position 0 (first send) |
+| `order_1` | int | Email index for delivery position 1 (second send) |
+| … | … | … |
+| `order_9` | int | Email index for delivery position 9 (final send) |
+
+**Email index → template name mapping (`PO_number_list`):**
+
+| Index | Template Name | Content Focus |
+|-------|--------------|---------------|
+| 0 | `ml_funding_enables_investing` | How funding unlocks investing features |
+| 1 | `ml_investing_starts_here` | Getting-started / onboarding |
+| 2 | `ml_explore_the_app_investing` | App exploration (investment features) |
+| 3 | `ml_funding_faq` | FAQ about the funding process (trust) |
+| 4 | `ml_user_clustering_emails_fracs` | ML-personalized cluster-based content |
+| 5 | `ml_funding_is_safe` | Trust & safety / security assurances |
+| 6 | `ml_picking_an_investment` | Investment selection guidance |
+| 7 | `ml_investing_101` | Investing education / basics |
+| 8 | `ml_diversified_portfolio` | Portfolio diversification concepts |
+| 9 | `ml_explore_the_app_list` | App exploration (browsing/list features) |
+
+**Randomization:** Each user's `order_0`–`order_9` is a permutation of {0–9} drawn without replacement, ensuring every user receives all 10 templates exactly once and no template is systematically favored in any delivery position.
+
+**Timing:** For `_D` groups: position 0 = Day 0, position 1 = Day 1, …, position 9 = Day 9. For `_W` groups: positions map to Mon/Fri delivery days (0=Day 0, 1=Day 4, 2=Day 7, … 9=Day 32).
+
+---
+
+### File 3: `user_events.csv` — Primary Analysis Table *(large file, not in git)*
+**Shape:** 480,000 rows × 22 columns · **Role:** One row per experiment user with summarized email status, account outcome timestamps, and platform activity metrics. This is the central table for all analyses.
+
+#### Identifiers & Group Assignment
+| Column | Type | Description |
+|--------|------|-------------|
+| `user_uuid` | str | Unique user ID — primary join key |
+| `group_name` | str | Treatment arm (24 possible values) |
+
+#### Email Interaction Status (10 columns, one per template)
+Each `ml_*` column stores the **highest-intent action** that user took on that specific email template:
+
+| Value | Meaning |
+|-------|---------|
+| `NaN` | Email not yet sent to this user, or was dropped before delivery |
+| `delivered` | Email reached inbox; user did not open it |
+| `open` | User opened the email |
+| `unsubscribe` | User clicked the unsubscribe link (counter-metric) |
+| `spamreport` | User reported the email as spam (critical counter-metric) |
+
+> **Key encoding rule:** `NaN` means "not delivered" for purposes of computing open rate — use `.notnull()` to identify the delivered population, then `== 'open'` to identify openers.
+
+#### Account Lifecycle Outcomes
+| Column | Type | Description |
+|--------|------|-------------|
+| `approved_at` | datetime | Timestamp when the user passed identity verification (KYC) and account was approved |
+| `first_funded_at` | datetime | **Primary outcome.** Timestamp of user's first qualifying deposit. `NaN` = not yet funded during the observation window |
+| `first_linked_bank_account_at` | datetime | **Secondary outcome.** Timestamp of first bank account linkage. `NaN` = not yet linked |
+
+#### Platform Activity Metrics (behavioral covariates)
+| Column | Type | Description |
+|--------|------|-------------|
+| `5d_trading_avg_event_count` | float | Average daily trading events over past 5 days; `NaN` = no recent trading activity |
+| `2d_non_trading_avg_event_count` | float | Average daily non-trading app events (browse, login) over past 2 days |
+| `20d_trading_avg_event_count` | float | Average daily trading events over past 20 days (broader window) |
+| `8d_non_trading_avg_event_count` | float | Average daily non-trading events over past 8 days |
+| `1d_trading_avg_event_count` | float | Average trading events on the most recent day |
+| `1d_non_trading_avg_event_count` | float | Average non-trading events on the most recent day |
+| `num_received_email` | int | Total emails successfully delivered to this user (0–10); filter `> 0` to isolate active treatment participants |
+
+---
+
+### File 4: `email_events.csv` — Raw Post-Office Event Log *(large file, not in git)*
+**Shape:** 9,553,330 rows × 6 columns · **Role:** Raw event stream from the email delivery system. One row per event (not per user), enabling time-series delivery monitoring.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `stitch_email_events.category` | str | JSON-like string encoding template and sender, e.g. `["ml_funding_faq","post-office"]` — template name must be parsed out |
+| `stitch_email_events.dt_date` | str | Event date in `YYYY-MM-DD` format |
+| `user_uuid` | str | User identifier — joins to `user_events.csv` |
+| `event` | str | Event type: `processed`, `delivered`, `open`, `dropped`, `bounce`, `deferred`, `unsubscribe`, `spamreport` |
+| `reason` | str | For bounce/drop events: ESP error string (e.g., `"550 5.1.1 The email account does not exist"`); `NaN` for normal events |
+| `stitch_email_events.count_events` | int | Event count for this user-email-date combination (usually 1; may be >1 for repeat opens) |
+
+**Event type reference:**
+
+| Event | Count | Rate | Meaning |
+|-------|------:|------|---------|
+| `processed` | 4,208,119 | — | Accepted by ESP for delivery attempt |
+| `delivered` | 4,191,336 | 100% (base) | Successfully reached recipient inbox |
+| `open` | 870,651 | 20.8% | Recipient opened (pixel-tracked) |
+| `dropped` | 241,805 | 5.8% | Suppressed before send (prior unsubscribe, invalid address) |
+| `bounce` | 18,166 | 0.43% | Hard or soft delivery failure |
+| `deferred` | 12,059 | 0.29% | Temporarily delayed; usually auto-retried |
+| `unsubscribe` | 10,894 | 0.26% | Opted out — **counter-metric** |
+| `spamreport` | 300 | 0.007% | Marked as spam — **critical counter-metric** (threshold: <0.10%) |
+
+---
+
+### File 5: `control_groups_rate.csv` — Control Group Baselines
+**Shape:** 12 rows × 6 columns · **Role:** Pre-computed baseline funding and link rates for matched control groups (no email exposure). Used as the null hypothesis value $p_0$ in A/B z-tests.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `group_name` | str | Segment label with `_D` suffix (one row per segment; both `_D` and `_W` treatment arms reference the same control row) |
+| `num_users_in_control` | int | Total users in the control group for this segment |
+| `num_funded_in_control` | int | Users who funded during the observation window — numerator for funding rate |
+| `funding_rate_in_control` | float | `= num_funded / num_users` — the baseline funding rate used as $p_0$ in the proportions z-test |
+| `num_link_in_control` | int | Users who linked a bank account during the window |
+| `link_rate_in_control` | float | Baseline bank-link rate; `= 1.0` for segments where all users already had a linked account by design |
+
+> **Join logic:** Treatment arms labeled `_W` are matched to their `_D` control counterpart via `group_name.str.replace('_W$', '_D')`. Control groups are maintained at the segment level, not the frequency level.
+
+---
+
+### How the Files Connect
+
+```
+sample_segment_groups.csv
+  └─ group_id / group_name
+        ├─► sample_uuid_email_order.csv  (group_id, group_name per user)
+        │       └─ user_uuid
+        │             ├─► user_events.csv        (one row per user)
+        │             └─► email_events.csv       (many rows per user)
+        └─► control_groups_rate.csv      (one row per segment, via group_name)
 ```
 
 ---
@@ -250,16 +407,17 @@ email-ab-experiment-fintech/
 ├── data/
 │   ├── sample_segment_groups.csv       # 12 个用户分群定义及用户数量
 │   ├── sample_uuid_email_order.csv     # 48 万用户 × 随机邮件投递计划
-│   ├── email_events.csv                # 原始邮件事件日志（950 万行）
-│   ├── user_events.csv                 # 用户级邮件状态 + 结果指标
-│   └── control_groups_rate.csv         # 对照组预计算出资/绑定率
+│   ├── email_events.csv                # 原始邮件事件日志（950 万行）— 未上传（871 MB）
+│   ├── user_events.csv                 # 用户级邮件状态 + 结果指标 — 未上传（81 MB）
+│   ├── control_groups_rate.csv         # 对照组预计算出资/绑定率
+│   └── README.md                       # 大文件的字段说明文档
 │
-├── assets/                             # 所有可视化输出图表
+├── assets/                             # 所有可视化输出图表（9 张）
 ├── reports/
-│   └── Report.tex                      # 完整学术分析报告（LaTeX 格式）
+│   ├── Report.tex                      # 完整学术分析报告（LaTeX 源文件）
+│   └── Report.pdf                      # 编译后的 PDF 报告（29 页）
 │
-├── README.md
-└── CLAUDE.md
+└── README.md
 ```
 
 ---
